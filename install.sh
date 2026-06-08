@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ytlive Tek Satır Kurulum Betiği (Host Installer)
+# oaYoutubeLive Tek Satır Kurulum Betiği (Host Installer)
 # Kullanım: curl -fsSL https://licensing.ornek.com/install.sh | sh
 
 set -e
@@ -10,7 +10,7 @@ LICENSE_SERVER_URL="https://ytlive-licensing.oasrvcom.workers.dev"
 DOWNLOAD_URL="YOUR_ZIP_DOWNLOAD_URL_HERE" # Google Drive veya Cloudflare R2 indirme linki
 
 echo "===================================================="
-echo "      ytlive Canlı Yayın Bilgi Yarışması Kurulumu    "
+echo "      oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu    "
 echo "===================================================="
 
 # Bağımlılık Kontrolleri

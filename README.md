@@ -1,11 +1,11 @@
-# ytlive - Canlı Yayın İnteraktif Bilgi Yarışması Yönetim Sistemi
+# oaYoutubeLive - Canlı Yayın İnteraktif Bilgi Yarışması Yönetim Sistemi
 
 [![License](https://img.shields.io/badge/license-V8_Bytecode_Encrypted-blueviolet.svg)](#)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](#)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20VDS-orange.svg)](#)
 [![Licensing](https://img.shields.io/badge/Licensing-HWID_%26_IP_Collision-red.svg)](#)
 
-**ytlive**, YouTube Live (Canlı Yayın) platformunda dikey formatta interaktif bilgi yarışması akışları düzenlemenizi sağlayan, chat tabanlı puanlama ve yönetim paneline sahip profesyonel bir yayın otomasyon yazılımıdır. 
+**oaYoutubeLive**, YouTube Live (Canlı Yayın) platformunda dikey formatta interaktif bilgi yarışması akışları düzenlemenizi sağlayan, chat tabanlı puanlama ve yönetim paneline sahip profesyonel bir yayın otomasyon yazılımıdır. 
 
 R10 gibi pazar yerlerinde satış yapmaya uygun, warez ve izinsiz kopyalamaya karşı tam donanımlı kriptografik lisanslama motoruyla güçlendirilmiştir.
 

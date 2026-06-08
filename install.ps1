@@ -1,4 +1,4 @@
-# ytlive Windows Tek Satır Kurulum Betiği (Host Installer)
+# oaYoutubeLive Windows Tek Satır Kurulum Betiği (Host Installer)
 # Kullanım: powershell -ExecutionPolicy Bypass -File install.ps1
 
 $ErrorActionPreference = "Stop"
@@ -8,7 +8,7 @@ $licenseServerUrl = "https://ytlive-licensing.oasrvcom.workers.dev"
 $downloadUrl = "YOUR_ZIP_DOWNLOAD_URL_HERE" # Google Drive veya Cloudflare R2 indirme linki
 
 Write-Host "====================================================" -ForegroundColor Yellow
-Write-Host "      ytlive Canlı Yayın Bilgi Yarışması Kurulumu    " -ForegroundColor Yellow
+Write-Host "      oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu    " -ForegroundColor Yellow
 Write-Host "====================================================" -ForegroundColor Yellow
 
 # Bağımlılık Kontrolleri
