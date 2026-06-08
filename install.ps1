@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 
 # Yapılandırma
 $licenseServerUrl = "https://ytlive-licensing.oasrvcom.workers.dev"
-$downloadUrl = "YOUR_ZIP_DOWNLOAD_URL_HERE" # Google Drive veya Cloudflare R2 indirme linki
+$downloadUrl = "https://github.com/oaonuraksoy/oaYoutubeLive/releases/download/v2026.6.9/ytlive-dist.zip" # Google Drive veya Cloudflare R2 indirme linki
 
 Write-Host "====================================================" -ForegroundColor Yellow
 Write-Host "      oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu    " -ForegroundColor Yellow
