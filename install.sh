@@ -59,7 +59,11 @@ echo "Donanım Kimliğiniz (HWID): $HWID"
 
 # Lisans Girişi & Aktivasyon
 echo "[3/5] Lisans aktivasyonu başlatılıyor..."
-read -p "Lütfen Lisans Anahtarınızı Girin: " LICENSE_KEY
+if [ -t 0 ]; then
+    read -p "Lütfen Lisans Anahtarınızı Girin: " LICENSE_KEY
+else
+    read -p "Lütfen Lisans Anahtarınızı Girin: " LICENSE_KEY < /dev/tty
+fi
 
 if [ -z "$LICENSE_KEY" ]; then
     echo "Hata: Lisans anahtarı boş bırakılamaz."
@@ -108,7 +112,7 @@ echo "$SIGNED_LICENSE" > data/license.json
 # .env dosyasını oluştur
 cat <<EOT > .env
 PORT=3000
-FRONTEND_URL=http://localhost:5173
+FRONTEND_URL=http://localhost:3000
 REDIS_HOST=redis
 REDIS_PORT=6379
 HOST_HWID=$HWID
@@ -136,7 +140,7 @@ docker-compose up -d --build
 echo "===================================================="
 echo "✓ Kurulum Başarıyla Tamamlandı!"
 echo "----------------------------------------------------"
-echo "Yönetim Paneli: http://localhost:5173"
+echo "Yönetim Paneli: http://localhost:3000/admin"
 echo "Yayın Ekranı:   http://localhost:3000"
 echo "Lisans Sahibi:  \$(echo '$RESPONSE' | grep -o -E '\"owner\":\"[^\"]+\"' | cut -d'\"' -f4)"
 echo "Bitiş Tarihi:   \$(echo '$RESPONSE' | grep -o -E '\"expiresAt\":\"[^\"]+\"' | cut -d'\"' -f4)"

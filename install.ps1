@@ -128,7 +128,7 @@ $licenseJson = $response.license | ConvertTo-Json -Depth 5
 Set-Content -Path "data\license.json" -Value $licenseJson -Encoding UTF8
 
 # .env dosyasını oluştur
-$envContent = "PORT=3000`r`nFRONTEND_URL=http://localhost:5173`r`nREDIS_HOST=redis`r`nREDIS_PORT=6379`r`nHOST_HWID=$hwid`r`nLICENSE_KEY=$licenseKey`r`nLICENSE_SERVER_URL=$licenseServerUrl"
+$envContent = "PORT=3000`r`nFRONTEND_URL=http://localhost:3000`r`nREDIS_HOST=redis`r`nREDIS_PORT=6379`r`nHOST_HWID=$hwid`r`nLICENSE_KEY=$licenseKey`r`nLICENSE_SERVER_URL=$licenseServerUrl"
 
 Set-Content -Path ".env" -Value $envContent -Encoding UTF8
 
@@ -151,7 +151,7 @@ docker-compose up -d --build
 Write-Host "====================================================" -ForegroundColor Yellow
 Write-Host "✓ Kurulum Başarıyla Tamamlandı!" -ForegroundColor Green
 Write-Host "----------------------------------------------------" -ForegroundColor Gray
-Write-Host "Yönetim Paneli: http://localhost:5173" -ForegroundColor Green
+Write-Host "Yönetim Paneli: http://localhost:3000/admin" -ForegroundColor Green
 Write-Host "Yayın Ekranı:   http://localhost:3000" -ForegroundColor Green
 Write-Host "Lisans Sahibi:  $($response.license.owner)" -ForegroundColor Green
 Write-Host "Bitiş Tarihi:   $($response.license.expiresAt)" -ForegroundColor Green
