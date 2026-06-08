@@ -84,11 +84,36 @@ try {
     if ($response.success -eq $true) {
         Write-Host "✓ Lisans başarıyla doğrulandı ve bu cihaza kilitlendi!" -ForegroundColor Green
     } else {
-        Write-Error "Hata: Lisans doğrulaması başarısız! Sunucu Yanıtı: $($response.message)"
+        Write-Host "Hata: Lisans doğrulaması başarısız! Sunucu Yanıtı: $($response.message)" -ForegroundColor Red
         exit 1
     }
 } catch {
-    Write-Error "Aktivasyon sunucusuna bağlanılamadı. İnternet bağlantınızı veya sunucu adresini kontrol edin.`nHata detayı: $_"
+    # Sunucudan dönen hata detayını yakala (404, 403 vb.)
+    $msg = $_.Exception.Message
+    $detail = ""
+    
+    if ($_.Exception.Response) {
+        try {
+            $stream = $_.Exception.Response.GetResponseStream()
+            $reader = New-Object System.IO.StreamReader($stream)
+            $responseBody = $reader.ReadToEnd()
+            $json = ConvertFrom-Json $responseBody
+            if ($json -and $json.message) {
+                $detail = $json.message
+            } else {
+                $detail = $responseBody
+            }
+        } catch {}
+    }
+    
+    if (-not [string]::IsNullOrEmpty($detail)) {
+        Write-Host "X Hata: Lisans aktivasyonu başarısız!" -ForegroundColor Red
+        Write-Host "Sunucu Yanıtı: $detail" -ForegroundColor Yellow
+    } else {
+        Write-Host "X Hata: Aktivasyon sunucusuna bağlanılamadı." -ForegroundColor Red
+        Write-Host "Lütfen internet bağlantınızı veya sunucu adresini kontrol edin." -ForegroundColor Yellow
+        Write-Host "Detay: $msg" -ForegroundColor Gray
+    }
     exit 1
 }
 
