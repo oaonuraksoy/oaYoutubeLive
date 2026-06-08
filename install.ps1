@@ -3,6 +3,10 @@
 
 $ErrorActionPreference = "Stop"
 
+# Türkçe karakter desteği için konsol çıktı kodlamasını UTF-8 olarak ayarla
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
 # Yapılandırma
 $licenseServerUrl = "https://ytlive-licensing.oasrvcom.workers.dev"
 $downloadUrl = "https://github.com/oaonuraksoy/oaYoutubeLive/releases/download/v2026.6.9/ytlive-dist.zip" # Google Drive veya Cloudflare R2 indirme linki

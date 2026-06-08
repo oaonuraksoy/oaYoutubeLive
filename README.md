@@ -34,7 +34,7 @@ curl -fsSL https://oaonuraksoy.github.io/oaYoutubeLive/install.sh | bash
 ### 🪟 Windows VDS / Bilgisayar İçin:
 Terminali Yönetici olarak başlatın ve aşağıdaki komutu girin:
 ```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; iex (irm 'https://oaonuraksoy.github.io/oaYoutubeLive/install.ps1')
+Set-ExecutionPolicy Bypass -Scope Process -Force; iex ([System.Text.Encoding]::UTF8.GetString((iwr 'https://oaonuraksoy.github.io/oaYoutubeLive/install.ps1' -UseBasicParsing).Content))
 ```
 
 *Komut çalıştırıldıktan sonra sizden lisans anahtarınızı isteyecek, donanım kimliğinizi sunucu ile eşleştirecek ve Docker container'larını otomatik olarak ayağa kaldıracaktır.*
