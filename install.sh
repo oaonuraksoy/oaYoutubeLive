@@ -66,11 +66,20 @@ if [ -z "$LICENSE_KEY" ]; then
     exit 1
 fi
 
-echo "Aktivasyon sunucusu ile el sıkışılıyor..."
 # Cloudflare Worker'a istek gönder
+echo "Aktivasyon sunucusu ile el sıkışılıyor..."
+set +e
 RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
   -d "{\"licenseKey\":\"$LICENSE_KEY\", \"hwid\":\"$HWID\"}" \
   "$LICENSE_SERVER_URL/api/activate")
+CURL_STATUS=$?
+set -e
+
+if [ $CURL_STATUS -ne 0 ] || [ -z "$RESPONSE" ]; then
+    echo "X Hata: Aktivasyon sunucusuna bağlanılamadı."
+    echo "Lütfen internet bağlantınızı veya sunucu adresini kontrol edin."
+    exit 1
+fi
 
 if echo "$RESPONSE" | grep -q '"success":[[:space:]]*true'; then
     echo "✓ Lisans başarıyla doğrulandı ve bu cihaza kilitlendi!"
