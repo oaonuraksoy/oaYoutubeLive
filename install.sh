@@ -129,7 +129,7 @@ if [ "$DOWNLOAD_URL" = "YOUR_ZIP_DOWNLOAD_URL_HERE" ]; then
 else
     echo "Güncel derlenmiş sürüm indiriliyor..."
     curl -L -o project.zip "$DOWNLOAD_URL"
-    unzip -q -o project.zip -d ./
+    unzip -q -o project.zip -d ./ || true
     rm project.zip
 fi
 
