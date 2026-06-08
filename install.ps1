@@ -99,15 +99,7 @@ $licenseJson = $response.license | ConvertTo-Json -Depth 5
 Set-Content -Path "data\license.json" -Value $licenseJson -Encoding UTF8
 
 # .env dosyasını oluştur
-$envContent = @"
-PORT=3000
-FRONTEND_URL=http://localhost:5173
-REDIS_HOST=redis
-REDIS_PORT=6379
-HOST_HWID=$hwid
-LICENSE_KEY=$licenseKey
-LICENSE_SERVER_URL=$licenseServerUrl
-"@
+$envContent = "PORT=3000`r`nFRONTEND_URL=http://localhost:5173`r`nREDIS_HOST=redis`r`nREDIS_PORT=6379`r`nHOST_HWID=$hwid`r`nLICENSE_KEY=$licenseKey`r`nLICENSE_SERVER_URL=$licenseServerUrl"
 
 Set-Content -Path ".env" -Value $envContent -Encoding UTF8
 
