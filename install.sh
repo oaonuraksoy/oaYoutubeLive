@@ -21,7 +21,7 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
     echo "Hata: Docker Compose kurulu değil. Lütfen önce Docker Compose yükleyin."
     exit 1
 fi
@@ -133,9 +133,21 @@ else
     rm project.zip
 fi
 
+# Docker yetki kontrolü (gerekirse sudo ekle)
+SUDO_CMD=""
+if ! docker ps &> /dev/null; then
+    if command -v sudo &> /dev/null; then
+        SUDO_CMD="sudo "
+    fi
+fi
+
 # Docker konteynerlerini başlat
 echo "Docker servisleri başlatılıyor..."
-docker-compose up -d --build
+if command -v docker-compose &> /dev/null; then
+    ${SUDO_CMD}docker-compose up -d --build
+else
+    ${SUDO_CMD}docker compose up -d --build
+fi
 
 echo "===================================================="
 echo "✓ Kurulum Başarıyla Tamamlandı!"

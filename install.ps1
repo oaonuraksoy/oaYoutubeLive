@@ -23,7 +23,17 @@ if (-not (Get-Command "docker" -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-if (-not (Get-Command "docker-compose" -ErrorAction SilentlyContinue)) {
+$hasCompose = (Get-Command "docker-compose" -ErrorAction SilentlyContinue)
+if (-not $hasCompose) {
+    try {
+        docker compose version | Out-Null
+        $hasCompose = $true
+    } catch {
+        $hasCompose = $false
+    }
+}
+
+if (-not $hasCompose) {
     Write-Error "Hata: Docker Compose kurulu değil. Lütfen Docker Compose kurun."
     exit 1
 }
@@ -146,7 +156,11 @@ if ($downloadUrl -eq "YOUR_ZIP_DOWNLOAD_URL_HERE") {
 
 # Docker konteynerlerini başlat
 Write-Host "Docker servisleri başlatılıyor..." -ForegroundColor Gray
-docker-compose up -d --build
+if (Get-Command "docker-compose" -ErrorAction SilentlyContinue) {
+    docker-compose up -d --build
+} else {
+    docker compose up -d --build
+}
 
 Write-Host "====================================================" -ForegroundColor Yellow
 Write-Host "✓ Kurulum Başarıyla Tamamlandı!" -ForegroundColor Green
