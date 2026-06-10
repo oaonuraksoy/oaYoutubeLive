@@ -304,11 +304,14 @@ if command -v chmod &> /dev/null; then
     fi
 fi
 
+LICENSE_OWNER=$(echo "$RESPONSE" | grep -o -E '"owner":"[^"]+"' | cut -d'"' -f4 || echo "Bilinmiyor")
+LICENSE_EXPIRES=$(echo "$RESPONSE" | grep -o -E '"expiresAt":"[^"]+"' | cut -d'"' -f4 || echo "Bilinmiyor")
+
 echo "===================================================="
 echo "✓ Kurulum Başarıyla Tamamlandı!"
 echo "----------------------------------------------------"
 echo "Yönetim Paneli: http://localhost:3000/admin"
 echo "Yayın Ekranı:   http://localhost:3000"
-echo "Lisans Sahibi:  \$(echo '$RESPONSE' | grep -o -E '\"owner\":\"[^\"]+\"' | cut -d'\"' -f4)"
-echo "Bitiş Tarihi:   \$(echo '$RESPONSE' | grep -o -E '\"expiresAt\":\"[^\"]+\"' | cut -d'\"' -f4)"
+echo "Lisans Sahibi:  $LICENSE_OWNER"
+echo "Bitiş Tarihi:   $LICENSE_EXPIRES"
 echo "===================================================="
