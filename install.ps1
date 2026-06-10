@@ -15,27 +15,88 @@ Write-Host "====================================================" -ForegroundCol
 Write-Host "      oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu    " -ForegroundColor Yellow
 Write-Host "====================================================" -ForegroundColor Yellow
 
-# Bağımlılık Kontrolleri
-Write-Host "[1/5] Sistem gereksinimleri kontrol ediliyor..." -ForegroundColor Cyan
-
-if (-not (Get-Command "docker" -ErrorAction SilentlyContinue)) {
-    Write-Error "Hata: Docker kurulu değil. Lütfen önce Docker ve Docker Desktop kurun."
-    exit 1
-}
-
-$hasCompose = (Get-Command "docker-compose" -ErrorAction SilentlyContinue)
-if (-not $hasCompose) {
-    try {
-        docker compose version | Out-Null
-        $hasCompose = $true
-    } catch {
-        $hasCompose = $false
+# 1. Administrator Yetkisi Kontrolü
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if (-not $isAdmin) {
+    Write-Warning "UYARI: Kurulum betiği yönetici (Administrator) yetkileri olmadan çalışıyor."
+    Write-Warning "Kurulum ve servis yapılandırması sırasında hata almamak için yönetici olarak çalıştırılması önerilir."
+    Write-Host "Devam etmek istiyor musunuz? (y/N): " -NoNewline
+    $ans = Read-Host
+    if ($ans -notmatch '^[Yy]$') {
+        exit 1
     }
 }
 
-if (-not $hasCompose) {
-    Write-Error "Hata: Docker Compose kurulu değil. Lütfen Docker Compose kurun."
-    exit 1
+# 2. Bağımlılık Kontrolü & Sürüm Teşhisi
+Write-Host "[1/5] Sistem gereksinimleri kontrol ediliyor..." -ForegroundColor Cyan
+
+$dockerStatus = "Eksik (Yüklenecek)"
+$composeStatus = "Eksik (Yüklenecek)"
+$composeCmd = ""
+
+# Docker kontrolü
+if (Get-Command "docker" -ErrorAction SilentlyContinue) {
+    $dockerVer = (docker --version).Split(' ')[2].Replace(",", "")
+    $dockerStatus = "Kurulu ($dockerVer)"
+    
+    # Docker Daemon çalışıyor mu kontrolü
+    try {
+        docker ps > $null 2>&1
+    } catch {
+        Write-Warning "UYARI: Docker yüklü ancak Docker Desktop/Daemon çalışmıyor olabilir."
+        Write-Warning "Lütfen Docker Desktop uygulamasını başlatın."
+    }
+}
+
+# Docker Compose kontrolü (Modern V2 öncelikli)
+$hasV2Compose = $false
+try {
+    docker compose version > $null 2>&1
+    $hasV2Compose = $true
+} catch {}
+
+if ($hasV2Compose) {
+    $composeVer = (docker compose version).Split(' ')[3]
+    $composeStatus = "Kurulu (Modern V2 - $composeVer)"
+    $composeCmd = "docker compose"
+} elseif (Get-Command "docker-compose" -ErrorAction SilentlyContinue) {
+    $composeVer = (docker-compose --version).Split(' ')[2]
+    $composeStatus = "Kurulu (Eski V1 - $composeVer)"
+    $composeCmd = "docker-compose"
+}
+
+Write-Host "====================================================" -ForegroundColor Yellow
+Write-Host "            Sistem Bağımlılık Teşhis Raporu         " -ForegroundColor Yellow
+Write-Host "====================================================" -ForegroundColor Yellow
+Write-Host "  - Docker:         $dockerStatus"
+Write-Host "  - Docker Compose: $composeStatus"
+Write-Host "====================================================" -ForegroundColor Yellow
+
+$needInstall = $false
+if ($dockerStatus -eq "Eksik (Yüklenecek)" -or [string]::IsNullOrEmpty($composeCmd)) {
+    $needInstall = $true
+}
+
+if ($needInstall) {
+    $choice = Read-Host "Eksik/uyumsuz bileşenlerin otomatik olarak kurulmasını (winget ile) onaylıyor musunuz? (Y/N)"
+    if ($choice -notmatch '^[Yy]$') {
+        Write-Host "Kurulum kullanıcı tarafından iptal edildi." -ForegroundColor Red
+        exit 1
+    }
+
+    # winget kontrolü
+    if (-not (Get-Command "winget" -ErrorAction SilentlyContinue)) {
+        Write-Error "Hata: Sisteminizde 'winget' (Windows Package Manager) bulunamadı. Lütfen Docker Desktop'ı manuel kurun: https://www.docker.com/products/docker-desktop/"
+        exit 1
+    }
+
+    # Docker Desktop Kurulumu (Compose v2 ile birlikte kurulur)
+    if ($dockerStatus -eq "Eksik (Yüklenecek)" -or [string]::IsNullOrEmpty($composeCmd)) {
+        Write-Host "Docker Desktop winget üzerinden kuruluyor..." -ForegroundColor Yellow
+        winget install --id Docker.DockerDesktop --accept-package-agreements --accept-source-agreements --silent
+        Write-Host "Docker Desktop başarıyla kuruldu. Lütfen bilgisayarınızı yeniden başlatın veya Docker Desktop uygulamasını açıp kurulum betiğini tekrar çalıştırın." -ForegroundColor Green
+        exit 0
+    }
 }
 
 # Donanım Kimliği (HWID) Hesaplama
@@ -156,7 +217,24 @@ if ($downloadUrl -eq "YOUR_ZIP_DOWNLOAD_URL_HERE") {
 
 # Docker konteynerlerini başlat
 Write-Host "Docker servisleri başlatılıyor..." -ForegroundColor Gray
-if (Get-Command "docker-compose" -ErrorAction SilentlyContinue) {
+if ([string]::IsNullOrEmpty($composeCmd)) {
+    $hasV2Compose = $false
+    try {
+        docker compose version > $null 2>&1
+        $hasV2Compose = $true
+    } catch {}
+    
+    if ($hasV2Compose) {
+        $composeCmd = "docker compose"
+    } elseif (Get-Command "docker-compose" -ErrorAction SilentlyContinue) {
+        $composeCmd = "docker-compose"
+    } else {
+        Write-Error "Hata: Docker Compose bulunamadı!"
+        exit 1
+    }
+}
+
+if ($composeCmd -eq "docker-compose") {
     docker-compose up -d --build
 } else {
     docker compose up -d --build
