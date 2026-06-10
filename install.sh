@@ -7,7 +7,7 @@ set -e
 
 # Yapılandırma
 LICENSE_SERVER_URL="https://ytlive-licensing.oasrvcom.workers.dev"
-DOWNLOAD_URL="https://github.com/oaonuraksoy/oaYoutubeLive/releases/download/v2026.6.9/ytlive-dist.zip" # Google Drive veya Cloudflare R2 indirme linki
+DOWNLOAD_URL="https://github.com/oaonuraksoy/oaYoutubeLive/releases/latest/download/ytlive-dist.zip" # Github releases en son surum indirme linki
 
 echo "===================================================="
 echo "      oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu    "

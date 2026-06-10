@@ -9,7 +9,7 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 
 # Yapılandırma
 $licenseServerUrl = "https://ytlive-licensing.oasrvcom.workers.dev"
-$downloadUrl = "https://github.com/oaonuraksoy/oaYoutubeLive/releases/download/v2026.6.9/ytlive-dist.zip" # Google Drive veya Cloudflare R2 indirme linki
+$downloadUrl = "https://github.com/oaonuraksoy/oaYoutubeLive/releases/latest/download/ytlive-dist.zip" # Github releases en son surum indirme linki
 
 Write-Host "====================================================" -ForegroundColor Yellow
 Write-Host "      oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu    " -ForegroundColor Yellow
