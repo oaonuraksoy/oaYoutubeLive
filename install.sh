@@ -9,6 +9,19 @@ set -e
 LICENSE_SERVER_URL="https://ytlive-licensing.oasrvcom.workers.dev"
 DOWNLOAD_URL="https://github.com/oaonuraksoy/oaYoutubeLive/releases/latest/download/ytlive-dist.zip" # Github releases en son surum indirme linki
 
+# SHA256 özetleme yardımcısı (Linux ve macOS uyumlu)
+hash_sha256() {
+    if command -v sha256sum &> /dev/null; then
+        echo -n "$1" | sha256sum | awk '{print $1}'
+    elif command -v shasum &> /dev/null; then
+        echo -n "$1" | shasum -a 256 | awk '{print $1}'
+    elif command -v openssl &> /dev/null; then
+        echo -n "$1" | openssl sha256 | awk -F'= ' '{print $2}'
+    else
+        echo -n "$1"
+    fi
+}
+
 echo "===================================================="
 echo "      oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu    "
 echo "===================================================="
@@ -91,6 +104,8 @@ if [ $NEED_INSTALL -eq 1 ]; then
             $SUDO_REQ apt-get update && $SUDO_REQ apt-get install -y curl
         elif [ "$PM" = "dnf" ] || [ "$PM" = "yum" ]; then
             $SUDO_REQ $PM install -y curl
+        elif [ "$(uname)" = "Darwin" ] && command -v brew &> /dev/null; then
+            brew install curl
         else
             echo "Hata: Paket yöneticisi bulunamadı. curl yüklenemedi."
             exit 1
@@ -104,6 +119,8 @@ if [ $NEED_INSTALL -eq 1 ]; then
             $SUDO_REQ apt-get update && $SUDO_REQ apt-get install -y unzip
         elif [ "$PM" = "dnf" ] || [ "$PM" = "yum" ]; then
             $SUDO_REQ $PM install -y unzip
+        elif [ "$(uname)" = "Darwin" ] && command -v brew &> /dev/null; then
+            brew install unzip
         else
             echo "Hata: Paket yöneticisi bulunamadı. unzip yüklenemedi."
             exit 1
@@ -112,27 +129,39 @@ if [ $NEED_INSTALL -eq 1 ]; then
 
     # Docker Kurulumu
     if ! command -v docker &> /dev/null; then
-        echo "-> Docker bulunamadı. Resmi Docker betiği ile kurulum başlatılıyor..."
-        curl -fsSL https://get.docker.com | sh
-        if command -v systemctl &> /dev/null; then
-            $SUDO_REQ systemctl enable --now docker
-        elif command -v service &> /dev/null; then
-            $SUDO_REQ service docker start
+        if [ "$(uname)" = "Darwin" ]; then
+            echo "-> Docker bulunamadı. macOS üzerinde Docker Desktop kurulması gerekmektedir."
+            echo "   Lütfen şu adresten Docker Desktop indirip kurun: https://www.docker.com/products/docker-desktop/"
+            echo "   Kurulumu yaptıktan sonra Docker'ı başlatın ve bu betiği tekrar çalıştırın."
+            exit 1
+        else
+            echo "-> Docker bulunamadı. Resmi Docker betiği ile kurulum başlatılıyor..."
+            curl -fsSL https://get.docker.com | sh
+            if command -v systemctl &> /dev/null; then
+                $SUDO_REQ systemctl enable --now docker
+            elif command -v service &> /dev/null; then
+                $SUDO_REQ service docker start
+            fi
         fi
     fi
 
     # Docker Compose Kurulumu
     if [ -z "$COMPOSE_CMD" ]; then
-        echo "-> Modern Docker Compose V2 kuruluyor..."
-        if [ "$PM" = "apt" ]; then
-            $SUDO_REQ apt-get update && $SUDO_REQ apt-get install -y docker-compose-plugin
-        elif [ "$PM" = "dnf" ] || [ "$PM" = "yum" ]; then
-            $SUDO_REQ $PM install -y docker-compose-plugin
-        else
-            echo "Hata: Docker Compose otomatik kurulamadı. Lütfen manuel kurun."
+        if [ "$(uname)" = "Darwin" ]; then
+            echo "Hata: Docker Compose bulunamadı! Lütfen Docker Desktop'ın kurulu ve çalışır durumda olduğundan emin olun."
             exit 1
+        else
+            echo "-> Modern Docker Compose V2 kuruluyor..."
+            if [ "$PM" = "apt" ]; then
+                $SUDO_REQ apt-get update && $SUDO_REQ apt-get install -y docker-compose-plugin
+            elif [ "$PM" = "dnf" ] || [ "$PM" = "yum" ]; then
+                $SUDO_REQ $PM install -y docker-compose-plugin
+            else
+                echo "Hata: Docker Compose otomatik kurulamadı. Lütfen manuel kurun."
+                exit 1
+            fi
+            COMPOSE_CMD="docker compose"
         fi
-        COMPOSE_CMD="docker compose"
     fi
 fi
 
@@ -167,23 +196,37 @@ fi
 echo "[2/5] Benzersiz donanım kimliği (HWID) hesaplanıyor..."
 HWID=""
 
-if [ -r /sys/class/dmi/id/product_uuid ]; then
-    HWID=$(cat /sys/class/dmi/id/product_uuid | tr -d ' \t\r\n')
-elif command -v dmidecode &> /dev/null; then
-    HWID=$(dmidecode -s system-uuid 2>/dev/null | tr -d ' \t\r\n')
+if [ "$(uname)" = "Darwin" ]; then
+    # macOS UUID tespiti
+    if command -v ioreg &> /dev/null; then
+        HWID=$(ioreg -rd1 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/ {print $4}' | tr -d ' \t\r\n')
+    fi
+else
+    # Linux UUID tespiti
+    if [ -r /sys/class/dmi/id/product_uuid ]; then
+        HWID=$(cat /sys/class/dmi/id/product_uuid | tr -d ' \t\r\n')
+    elif command -v dmidecode &> /dev/null; then
+        HWID=$(dmidecode -s system-uuid 2>/dev/null | tr -d ' \t\r\n')
+    fi
 fi
 
 # Fallback: Eğer UUID alınamadıysa MAC adreslerini SHA256 ile özetle
 if [ -z "$HWID" ] || [ "$HWID" = "00000000-0000-0000-0000-000000000000" ] || [ "$HWID" = "Not Specified" ]; then
-    MAC_LIST=$(ip link | grep -o -E 'link/ether [0-9a-f:]{17}' | awk '{print $2}' | sort | tr -d '\n')
+    MAC_LIST=""
+    if command -v ip &> /dev/null; then
+        MAC_LIST=$(ip link | grep -o -E 'link/ether [0-9a-f:]{17}' | awk '{print $2}' | sort | tr -d '\n')
+    elif command -v ifconfig &> /dev/null; then
+        MAC_LIST=$(ifconfig | grep -o -E 'ether [0-9a-f:]{17}' | awk '{print $2}' | sort | tr -d '\n')
+    fi
+    
     if [ -n "$MAC_LIST" ]; then
-        HWID=$(echo -n "$MAC_LIST" | sha256sum | awk '{print $1}')
+        HWID=$(hash_sha256 "$MAC_LIST")
     else
-        HWID=$(hostname | sha256sum | awk '{print $1}')
+        HWID=$(hash_sha256 "$(hostname)")
     fi
 else
     # UUID'yi güvenli bir şekilde hash'le
-    HWID=$(echo -n "$HWID" | sha256sum | awk '{print $1}')
+    HWID=$(hash_sha256 "$HWID")
 fi
 
 HWID=$(echo "$HWID" | tr -d ' \t\r\n')
