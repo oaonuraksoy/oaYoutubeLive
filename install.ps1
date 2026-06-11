@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
 # Yapılandırma
-$version = "v2026.6.11-b4"
+$version = "v2026.6.11-b5"
 $licenseServerUrl = "https://ytlive-licensing.oasrvcom.workers.dev"
 $downloadUrl = "https://github.com/oaonuraksoy/oaYoutubeLive/releases/latest/download/ytlive-dist.zip" # Github releases en son surum indirme linki
 

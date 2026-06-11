@@ -6,7 +6,7 @@
 set -e
 
 # Yapılandırma
-VERSION="v2026.6.11-b4"
+VERSION="v2026.6.11-b5"
 LICENSE_SERVER_URL="https://ytlive-licensing.oasrvcom.workers.dev"
 DOWNLOAD_URL="https://github.com/oaonuraksoy/oaYoutubeLive/releases/latest/download/ytlive-dist.zip" # Github releases en son surum indirme linki
 
