@@ -6,6 +6,7 @@
 set -e
 
 # Yapılandırma
+VERSION="v2026.6.11-b4"
 LICENSE_SERVER_URL="https://ytlive-licensing.oasrvcom.workers.dev"
 DOWNLOAD_URL="https://github.com/oaonuraksoy/oaYoutubeLive/releases/latest/download/ytlive-dist.zip" # Github releases en son surum indirme linki
 
@@ -23,7 +24,7 @@ hash_sha256() {
 }
 
 echo "===================================================="
-echo "      oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu    "
+echo "   oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu (v$VERSION)   "
 echo "===================================================="
 
 # 1. Asıl Kullanıcı ve Grup Tespiti (Sahiplik ve İzin Sorunlarını Önlemek İçin)
@@ -302,7 +303,7 @@ if [ "$DOWNLOAD_URL" = "YOUR_ZIP_DOWNLOAD_URL_HERE" ]; then
     echo "Bilgilendirme: Proje dosyaları yerel kaynaklardan derlenerek başlatılıyor."
     echo "(Üretim ortamında download URL üzerinden güncel sürüm indirilecektir.)"
 else
-    echo "Güncel derlenmiş sürüm indiriliyor..."
+    echo "Güncel derlenmiş sürüm ($VERSION) indiriliyor..."
     curl -L -o project.zip "$DOWNLOAD_URL"
     unzip -q -o project.zip -d ./ || true
     rm project.zip

@@ -8,11 +8,12 @@ $ErrorActionPreference = "Stop"
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
 # Yapılandırma
+$version = "v2026.6.11-b4"
 $licenseServerUrl = "https://ytlive-licensing.oasrvcom.workers.dev"
 $downloadUrl = "https://github.com/oaonuraksoy/oaYoutubeLive/releases/latest/download/ytlive-dist.zip" # Github releases en son surum indirme linki
 
 Write-Host "====================================================" -ForegroundColor Yellow
-Write-Host "      oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu    " -ForegroundColor Yellow
+Write-Host "   oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu (v$version)   " -ForegroundColor Yellow
 Write-Host "====================================================" -ForegroundColor Yellow
 
 # 1. Administrator Yetkisi Kontrolü
@@ -209,7 +210,7 @@ Write-Host "[5/5] Uygulama dosyaları indiriliyor ve başlatılıyor..." -Foregr
 if ($downloadUrl -eq "YOUR_ZIP_DOWNLOAD_URL_HERE") {
     Write-Host "Bilgilendirme: Proje dosyaları yerel kaynaklardan derlenerek başlatılıyor." -ForegroundColor Gray
 } else {
-    Write-Host "Güncel derlenmiş sürüm indiriliyor..." -ForegroundColor Gray
+    Write-Host "Güncel derlenmiş sürüm ($version) indiriliyor..." -ForegroundColor Gray
     Invoke-WebRequest -Uri $downloadUrl -OutFile "project.zip"
     Expand-Archive -Path "project.zip" -DestinationPath "." -Force
     Remove-Item "project.zip" -Force
