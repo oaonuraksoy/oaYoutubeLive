@@ -1,4 +1,4 @@
-# oaYoutubeLive Windows Tek Satır Kurulum Betiği (Host Installer)
+﻿# oaYoutubeLive Windows Tek Satır Kurulum Betiği (Host Installer)
 # Kullanım: powershell -ExecutionPolicy Bypass -File install.ps1
 
 $ErrorActionPreference = "Stop"
@@ -8,12 +8,24 @@ $ErrorActionPreference = "Stop"
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
 # Yapılandırma
-$version = "v2026.6.11-b6"
+$fallbackVersion = "v2026.6.11-b6"
 $licenseServerUrl = "https://ytlive-licensing.oasrvcom.workers.dev"
 $downloadUrl = "https://github.com/oaonuraksoy/oaYoutubeLive/releases/latest/download/ytlive-dist.zip" # Github releases en son surum indirme linki
 
+# Sürümü dinamik olarak GitHub API'den çekmeye çalış
+$version = $fallbackVersion
+try {
+    $apiResponse = Invoke-RestMethod -Uri "https://api.github.com/repos/oaonuraksoy/oaYoutubeLive/releases/latest" -Method Get -TimeoutSec 5
+    if ($apiResponse -and $apiResponse.tag_name) {
+        $version = $apiResponse.tag_name
+    }
+} catch {
+    # Hata durumunda fallback sürüm kullanılacak
+}
+
+
 Write-Host "====================================================" -ForegroundColor Yellow
-Write-Host "   oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu (v$version)   " -ForegroundColor Yellow
+Write-Host "   oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu ($version)   " -ForegroundColor Yellow
 Write-Host "====================================================" -ForegroundColor Yellow
 
 # 1. Administrator Yetkisi Kontrolü

@@ -6,9 +6,20 @@
 set -e
 
 # Yapılandırma
-VERSION="v2026.6.11-b6"
+FALLBACK_VERSION="v2026.6.11-b6"
 LICENSE_SERVER_URL="https://ytlive-licensing.oasrvcom.workers.dev"
 DOWNLOAD_URL="https://github.com/oaonuraksoy/oaYoutubeLive/releases/latest/download/ytlive-dist.zip" # Github releases en son surum indirme linki
+
+# Sürümü dinamik olarak GitHub API'den çekmeye çalış
+LATEST_TAG=""
+if command -v curl &> /dev/null; then
+    API_RESPONSE=$(curl -s --max-time 5 https://api.github.com/repos/oaonuraksoy/oaYoutubeLive/releases/latest || true)
+    if [ -n "$API_RESPONSE" ]; then
+        LATEST_TAG=$(echo "$API_RESPONSE" | grep -o -E '"tag_name": *"[^"]+"' | head -n1 | cut -d'"' -f4 || true)
+    fi
+fi
+VERSION=${LATEST_TAG:-"$FALLBACK_VERSION"}
+
 
 # SHA256 özetleme yardımcısı (Linux ve macOS uyumlu)
 hash_sha256() {
@@ -24,7 +35,7 @@ hash_sha256() {
 }
 
 echo "===================================================="
-echo "   oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu (v$VERSION)   "
+echo "   oaYoutubeLive Canlı Yayın Bilgi Yarışması Kurulumu ($VERSION)   "
 echo "===================================================="
 
 # 1. Asıl Kullanıcı ve Grup Tespiti (Sahiplik ve İzin Sorunlarını Önlemek İçin)
