@@ -1,4 +1,4 @@
-﻿# oaYoutubeLive Windows Tek Satır Kurulum Betiği (Host Installer)
+# oaYoutubeLive Windows Tek Satır Kurulum Betiği (Host Installer)
 # Kullanım: powershell -ExecutionPolicy Bypass -File install.ps1
 
 $ErrorActionPreference = "Stop"
